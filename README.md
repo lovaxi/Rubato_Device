@@ -6,7 +6,7 @@
 
 ![Rubato](assets/product.jpg)
 
-![Rubato in action](https://github.com/user-attachments/assets/32402d91-5818-4a01-8f6a-1bca316787a9)
+![Rubato in action](assets/product.gif)
 
 Rubato is an ESP8266 desk companion with a 240×240 color display. It watches your AI coding sessions and turns AI wait time into health breaks.
 
