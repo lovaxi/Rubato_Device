@@ -13,6 +13,7 @@
 - **同步清单**：✅ 插件源码仓 `Thinktime_Plugin_DSH`（dsh + opencode 双套 lib 的 topic/品牌字样 + package.json name：fadai → rubato、fadai-opencode → rubato-opencode，导出符号 Fadai → Rubato，注释 FD- → TT- 对齐固件）；⬜ 部署副本 `~/.dsh/profiles/node_modules/thinktime/`（lib 两文件覆盖 + cordis.patch.yml 校对 + 重启 DSH——**须与设备重刷同一维护窗口执行，否则 AI→设备链路中断**）；⬜ 其余 5 插件仓（OpenCode / Codex / ClaudeCode / Cursor / OpenClaw 独立仓）按同规则平移；⬜ GitHub 仓库名 Rename（旧名自动 301）；⬜ OTA 产物命名 `Rubato-<ver>.bin`
 - 历史条目中的 Thinktime / fadai 字样保持原貌（历史事实）
 - **补充（同日晚，GitHub 文档全量同步）**：用户要求 README 中 thinktime 全量调整为 rubato——已改 4 处：插件目录引用 `Thinktime_DshPlugin/` → `Rubato_Plugin_DSH/`（×2）、部署路径 `node_modules/thinktime/` → `node_modules/rubato/`、数据文件名 → `rubato-records.jsonl`；changelog 标题同步为 Rubato。**此四项覆盖上一行"刻意保留"中的对应项**（插件目录名、数据文件名），本地目录/数据文件/部署副本的物理重命名随维护窗口跟进；`TT-` 前缀保留决策不变
+- **补充（同日晚，deviceId 前缀迁移）**：用户拍板撤销"`TT-` 前缀保留"决策——前缀 **`TT-` → `Rubato-`**，固件 MAC 推导（`Rubato-<末 6 位 hex>`）、示例、串口提示全同步。**EEPROM 身份区布局随之迁移**：deviceId 缓冲 12→16 字节（150-165）、token 地址 162→166（166-199）、发证校验 3-11 → 3-15 字符。**迁移代价：已发证设备（token 写在旧地址 162）刷新本固件后 token 读位错移，必须重新 `0x06` 发证 + EMQX 重建同名账号 + 插件配置改 username**——当前仅开发机一台，成本可接受；量产前完成迁移即零存量负担
 
 ## 2026-08-31 · V1.0.5 产品更名 fadai（避开 Thinktime 海外商标冲突）
 

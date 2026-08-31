@@ -211,13 +211,13 @@ static const char MQTT_CA[] PROGMEM =
 //   0x06 <deviceId> <token>  writes it,  0x07  wipes it.
 // deviceId doubles as the MQTT username, token is the password; both are
 // device-specific - no shared secret ships inside the firmware.
-// 150-194: AFTER the wifi config struct (30-125) and health counters (140-145),
+// 150-199: AFTER the wifi config struct (30-125) and health counters (140-145),
 // so savewificonfig can never clobber the device identity on boot
-#define DEV_ID_ADDR 150    // 150-161: deviceId string, NUL-terminated (max 11 chars)
-#define DEV_TOKEN_ADDR 162 // 162-194: token string, NUL-terminated (max 32 chars)
-char deviceId[12] = "";      // e.g. TT-A1B2C3, shown on the boot screen
+#define DEV_ID_ADDR 150    // 150-165: deviceId string, NUL-terminated (max 15 chars)
+#define DEV_TOKEN_ADDR 166 // 166-199: token string, NUL-terminated (max 32 chars)
+char deviceId[16] = "";      // e.g. Rubato-A1B2C3, shown on the boot screen
 char devToken[33] = "";      // random token from the provisioning ledger
-char suggestedId[12] = "";   // MAC-derived TT-<last 6 hex>, filled in loadDeviceInfo()
+char suggestedId[16] = "";   // MAC-derived Rubato-<last 6 hex>, filled in loadDeviceInfo()
 String mqttStateTopic = "";  // rubato/<deviceId>/state, built in loadDeviceInfo()
 
 WiFiClientSecure* mqttNet = nullptr;  // heap object: OTA deletes it to free the MQTT TLS RAM
@@ -234,7 +234,7 @@ bool deviceProvisioned() { return deviceId[0] != 0 && devToken[0] != 0; }
 // printable ASCII counts (anything else ends the string)
 void loadDeviceInfo() {
   memset(deviceId, 0, sizeof(deviceId));
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < 15; i++) {
     char c = (char)EEPROM.read(DEV_ID_ADDR + i);
     if (c < 0x21 || c > 0x7E) break;
     deviceId[i] = c;
@@ -250,14 +250,14 @@ void loadDeviceInfo() {
   // before provisioning - the boot screen shows it so 0x06 input is copy-free
   // MAC-derived identity: strip separators and normalize case first (the
   // format differs across cores: with/without colons, upper/lower), then take
-  // the LAST 6 hex digits, e.g. 3c8a1f43216c -> TT-43216c
+  // the LAST 6 hex digits, e.g. 3c8a1f43216c -> Rubato-43216c
   String mac = WiFi.macAddress();
   String hex = "";
   for (unsigned int i = 0; i < mac.length(); i++) {
     char c = mac[i];
     if (isxdigit(c)) hex += (char)tolower(c);
   }
-  String sug = String("TT-") + (hex.length() >= 6 ? hex.substring(hex.length() - 6) : hex);
+  String sug = String("Rubato-") + (hex.length() >= 6 ? hex.substring(hex.length() - 6) : hex);
   sug.toCharArray(suggestedId, sizeof(suggestedId));
 }
 
@@ -265,8 +265,8 @@ void loadDeviceInfo() {
 bool provisionDevice(String id, String token) {
   id.trim();
   token.trim();
-  if (id.length() < 3 || id.length() > 11) {
-    Serial.println("[PROV] bad deviceId: 3-11 chars, no spaces (e.g. TT-A1B2C3)");
+  if (id.length() < 3 || id.length() > 15) {
+    Serial.println("[PROV] bad deviceId: 3-15 chars, no spaces (e.g. Rubato-A1B2C3)");
     return false;
   }
   if (token.length() < 8 || token.length() > 32) {
@@ -543,7 +543,7 @@ void Serial_set() {
         if (sp > 0) {
           provisionDevice(args.substring(0, sp), args.substring(sp + 1));
         } else {
-          Serial.println("Usage: 0x06 <deviceId> <token>   e.g. 0x06 TT-A1B2C3 3f9c8e21...");
+          Serial.println("Usage: 0x06 <deviceId> <token>   e.g. 0x06 Rubato-A1B2C3 3f9c8e21...");
         }
         SMOD = "";
       } else if (SMOD == "0x07") {
@@ -601,7 +601,7 @@ bool mqttConnect() {
   }
   mqttNet->setTrustAnchors(mqttCA);  // chain + hostname verified; pre-NTP boot waits for a sane clock
 
-  String clientId = String(deviceId);  // already unique and prefixed (TT-xxxxxx)
+  String clientId = String(deviceId);  // already unique and prefixed (Rubato-xxxxxx)
   bool ok = mqttClient.connect(clientId.c_str(), deviceId, devToken);
   if (ok) {
     mqttClient.subscribe(mqttStateTopic.c_str());
