@@ -8,7 +8,7 @@
 
 ![Rubato in action](assets/product.gif)
 
-Rubato is an ESP8266 desk companion with a 240×240 color display. It watches your AI coding sessions and turns AI wait time into health breaks.
+Rubato is a retro-Macintosh mini screen that fits in your palm — an ESP8266 desk companion with a 240×240 color display. It watches your AI coding sessions and turns AI wait time into health breaks.
 
 ## How it works
 
