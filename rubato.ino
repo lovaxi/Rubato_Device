@@ -1,6 +1,6 @@
 /* *****************************************************************
  * 
- * Rubato - renamed from "Thinktime" to avoid the overseas trademark conflict
+ * Rubato (tempo rubato: "stolen time" - time given back to you)
  * 
  * Original author : Misaka
  * Modified by     : Weicheyou
