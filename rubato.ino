@@ -378,10 +378,7 @@ void readwificonfig() {
   for (int i = 0; i < sizeof(wificonf); i++) {
     *(p + i) = EEPROM.read(i + wifi_addr);
   }
-  Serial.printf("Read WiFi Config.....\r\n");
-  Serial.printf("SSID:%s\r\n", wificonf.stassid);
-  Serial.printf("PSW:%s\r\n", wificonf.stapsw);
-  Serial.printf("Connecting.....\r\n");
+  Serial.printf("[WIFI] config loaded: ssid='%s'\r\n", wificonf.stassid);  // psw intentionally not logged
 }
 
 // TFT JPEG output callback
@@ -1938,8 +1935,7 @@ void setup() {
     // Serial.println(WiFi.psk().c_str());
     strcpy(wificonf.stassid, WiFi.SSID().c_str());  // copy ssid
     strcpy(wificonf.stapsw, WiFi.psk().c_str());    // copy password
-    savewificonfig();
-    readwificonfig();
+    savewificonfig();  // persist the actual connection (portal-entered creds land here)
     // start the web server early so weather shows sooner
     Web_Sever_Init();
     Web_sever_Win();
