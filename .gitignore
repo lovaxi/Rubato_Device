@@ -1,0 +1,14 @@
+# build artifacts
+build/
+*.bin
+*.elf
+*.map
+ota-releases/
+
+# node deps (tools/logos)
+node_modules/
+
+# local test outputs
+.smoke/
+Thumbs.db
+.DS_Store
