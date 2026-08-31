@@ -6,24 +6,24 @@
 
 ![Rubato](assets/product.jpg)
 
-Rubato is an ESP8266 desk companion with a 240×240 color display. It watches your AI coding sessions and turns AI wait time into health breaks — the hours your AI agent works become hours your body moves.
+Rubato is an ESP8266 desk companion with a 240×240 color display. It watches your AI coding sessions and turns AI wait time into health breaks.
 
 ## How it works
 
 1. A small PC plugin publishes your AI session state over MQTT (TLS): `thinking` → `generating` → `done`
 2. A breathing orb mirrors the state — cream while thinking, glacier blue while generating, green when done
-3. When a task looks long (est. > 45 s), Rubato takes over the full screen with a colorful micro-break reminder
+3. When a task looks long (est. ≥ 30 s), Rubato takes over the full screen with a colorful micro-break reminder
 
 ## Six daily breaks
 
 Water · Bathroom break · Eye rest · Neck stretch · Kegels · Standing desk
 
-Each activity has a daily quota and a 40-minute minimum gap, so reminders land at a humane rhythm — never spammy. The promise is reminders delivered, not completion-rate check-ins.
+Each activity has a daily quota, and two full-screen breaks stay at least 30 minutes apart, so reminders land at a humane rhythm — never spammy. The promise is reminders delivered, not completion-rate check-ins.
 
 ## More than reminders
 
 - **Desk clock** — NTP time, western date format, weather with auto-location (Open-Meteo)
-- **State orb** — per-device MQTT credentials; plain text never touches the screen
+- **State orb** — per-device MQTT credentials; Rubato mirrors the session state, never the message text
 - **OTA self-update** — segmented HTTPS download with an anti-brick guard: a bad update lands in Safe Mode and self-heals remotely, no USB needed
 - **Web settings** — brightness, orientation, °C/°F from your browser; everything survives power loss
 
