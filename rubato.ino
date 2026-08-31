@@ -236,12 +236,12 @@ void loadDeviceInfo() {
   // before provisioning - the boot screen shows it so 0x06 input is copy-free
   // MAC-derived identity: strip separators and normalize case first (the
   // format differs across cores: with/without colons, upper/lower), then take
-  // the LAST 6 hex digits, e.g. 3c8a1f43216c -> RUBATO-43216C
+  // the LAST 6 hex digits, e.g. 3c8a1f43216c -> RUBATO-43216c
   String mac = WiFi.macAddress();
   String hex = "";
   for (unsigned int i = 0; i < mac.length(); i++) {
     char c = mac[i];
-    if (isxdigit(c)) hex += (char)toupper(c);
+    if (isxdigit(c)) hex += (char)tolower(c);
   }
   String sug = String("RUBATO-") + (hex.length() >= 6 ? hex.substring(hex.length() - 6) : hex);
   sug.toCharArray(suggestedId, sizeof(suggestedId));
