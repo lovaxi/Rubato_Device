@@ -36,5 +36,6 @@ ESP8266 (NodeMCU) + 240×240 TFT, Arduino framework (ESP8266 core 3.1.2, TFT_eSP
 ## License
 
 GPL-3.0 — original clock by Misaka (2021), redesigned as Rubato.
+Hardware design scheme from [SmallDesktopDisplay](https://github.com/chuxin520922/SmallDesktopDisplay) by chuxin520922.
 
 Full development history in [changelog.md](changelog.md).

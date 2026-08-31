@@ -36,5 +36,6 @@ ESP8266（NodeMCU）+ 240×240 TFT，Arduino 框架（ESP8266 core 3.1.2 / TFT_e
 ## 许可
 
 GPL-3.0——原始时钟作者 Misaka（2021），后由 Rubato 项目重设计。
+硬件设计方案来自 [SmallDesktopDisplay](https://github.com/chuxin520922/SmallDesktopDisplay)（作者 chuxin520922）。
 
 完整开发史见 [changelog.md](changelog.md)。
