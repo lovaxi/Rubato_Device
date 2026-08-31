@@ -1799,6 +1799,7 @@ void Webconfig() {
   wm.setClass("invert");
   wm.setMinimumSignalQuality(20);  // set min RSSI (percentage) to show in scans, null = 8%
 
+  wm.setConnectTimeout(10);  // cap wm's own saved-credential retry so the portal still shows fast
   bool res;
   res = wm.autoConnect("RUBATO");  // anonymous ap
 
@@ -1893,6 +1894,9 @@ void setup() {
   readwificonfig();  // read stored wifi info
   Serial.print("Connecting to WiFi ");
   Serial.println(wificonf.stassid);
+  WiFi.persistent(false);  // sketch EEPROM is the source of truth - stop the SDK from
+                           // keeping its own NVS copy (diverged NVS creds = silent slow boots)
+  uint32_t wifiT0 = millis();
   WiFi.begin(wificonf.stassid, wificonf.stapsw);
   drawBootTitle();  // small wordmark, top center: hidden whenever boot status text takes over
 
@@ -1909,7 +1913,10 @@ void setup() {
       // slow (DHCP, 2.4G congestion, AP reboot); surrender to the portal only
       // after 3 full bars (~20s), never wiping the stored credentials
       loadNum = 0;
-      if (++barCycles >= 3) {
+      WiFi.reconnect();  // re-kick association: a stalled first attempt often links in seconds
+      barCycles++;
+      Serial.printf("[WIFI] still down, retry #%d t=%lu ms\r\n", barCycles, millis() - wifiT0);
+      if (barCycles >= 3) {
         // with WEB config on, smartconfig is retired
         Web_win();
         Webconfig();
@@ -1924,6 +1931,7 @@ void setup() {
   }
 
   if (WiFi.status() == WL_CONNECTED) {
+    Serial.printf("[WIFI] connected '%s' t=%lu ms\r\n", WiFi.SSID().c_str(), millis() - wifiT0);
     // Serial.print("SSID:");
     // Serial.println(WiFi.SSID().c_str());
     // Serial.print("PSW:");
