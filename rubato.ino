@@ -2,20 +2,6 @@
  * 
  * Rubato (tempo rubato: "stolen time" - time given back to you)
  * 
- * Original author : Misaka
- * Modified by     : Weicheyou
- * Modified by     : XiongGong AI
- * Created         : 2021.07.19
- * Last modified   : 2026.08.27
- *            V1.0    Text adjusted for western users, unused features removed
- * 
- * Pin assignment  : SCK  GPIO14
- *             MOSI  GPIO13
- *             RES   GPIO2
- *             DC    GPIO0
- *             LCDBL GPIO5
- *             
- * 
  * *****************************************************************/
 #define Version "V1.1.1"  // OTA compares this against the ver field; keep bumping every release
 /* *****************************************************************
@@ -442,7 +428,7 @@ void drawBootTitle() {
   tft.setTextDatum(TC_DATUM);
   tft.setTextColor(TFT_WHITE, COL_BG);
   tft.setFreeFont(&FreeSansBold18pt7b);
-  tft.drawString("rubato", 120, 52);
+  tft.drawString("Rubato", 120, 52);
   tft.setTextDatum(TL_DATUM);
 }
 
@@ -1773,9 +1759,9 @@ void Web_win() {
   clk.setTextDatum(CC_DATUM);  // text datum
   clk.setTextColor(TFT_GREEN, COL_BG);
   clk.drawString("WiFi Connect Fail!", 100, 10, 2);
-  clk.drawString("SSID:", 45, 40, 2);
+  clk.drawString("SSID", 45, 40, 2);
   clk.setTextColor(TFT_WHITE, COL_BG);
-  clk.drawString("rubato", 125, 40, 2);
+  clk.drawString("Rubato", 125, 40, 2);
   clk.pushSprite(20, 50);  // window position
 
   clk.deleteSprite();
@@ -1812,7 +1798,7 @@ void Webconfig() {
   wm.setMinimumSignalQuality(20);  // set min RSSI (percentage) to show in scans, null = 8%
 
   bool res;
-  res = wm.autoConnect("rubato");  // anonymous ap
+  res = wm.autoConnect("Rubato");  // anonymous ap
 
   while (!res)
     ;
