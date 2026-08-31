@@ -410,9 +410,13 @@ void loading(byte delayTime)  // draw boot screen: progress bar, status, id plat
   clk.setTextColor(TFT_GREEN, COL_BG);
   clk.drawString("Connecting to WiFi......", 120, 40, 2);
 
-  // bottom plate row: brand mark centered like an appliance badge, version pinned bottom-right
+  // bottom plate row: device id with the brand prefix uppercased (RUBATO-xxxxxx),
+  // version pinned bottom-right; x=108 keeps clearance from the version string
   clk.setTextColor(COL_INK_2, COL_BG);
-  clk.drawString("RUBATO", 120, 106, 2);
+  String plate = deviceId[0] ? deviceId : suggestedId;
+  int dash = plate.indexOf('-');
+  plate = "RUBATO-" + (dash >= 0 ? plate.substring(dash + 1) : plate);
+  clk.drawString(plate, 108, 106, 2);
   clk.drawRightString(Version, 236, 106, 2);
 
   clk.pushSprite(0, 110);  // window position
@@ -1759,7 +1763,7 @@ void Web_win() {
   clk.drawString("WiFi Connect Fail!", 100, 10, 2);
   clk.drawString("SSID", 45, 40, 2);
   clk.setTextColor(TFT_WHITE, COL_BG);
-  clk.drawString("Rubato", 125, 40, 2);
+  clk.drawString("RUBATO", 125, 40, 2);
   clk.pushSprite(20, 50);  // window position
 
   clk.deleteSprite();
@@ -1796,7 +1800,7 @@ void Webconfig() {
   wm.setMinimumSignalQuality(20);  // set min RSSI (percentage) to show in scans, null = 8%
 
   bool res;
-  res = wm.autoConnect("Rubato");  // anonymous ap
+  res = wm.autoConnect("RUBATO");  // anonymous ap
 
   while (!res)
     ;
