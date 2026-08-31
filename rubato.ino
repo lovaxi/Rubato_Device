@@ -1771,7 +1771,10 @@ void Webconfig() {
   WiFi.mode(WIFI_STA);  // explicitly set mode, esp defaults to STA+AP
 
   delay(3000);
-  wm.resetSettings();  // wipe settings
+  // NOTE: no wm.resetSettings() here - it erased the saved WiFi on every
+  // portal entry, so one slow router moment (>7s at boot) wiped credentials.
+  // wm.autoConnect tries the stored credentials first and only opens the
+  // portal when they fail; 0x04 stays the one and only manual wipe.
 
   // add a custom input field
   int customFieldLength = 40;
@@ -1897,14 +1900,21 @@ void setup() {
   TJpgDec.setSwapBytes(true);
   TJpgDec.setCallback(tft_output);
 
+  int barCycles = 0;
   while (WiFi.status() != WL_CONNECTED) {
     loading(30);
 
     if (loadNum >= 194) {
-      // with WEB config on, smartconfig is retired
-      Web_win();
-      Webconfig();
-      break;
+      // one full bar without a link: clear it and try again - routers can be
+      // slow (DHCP, 2.4G congestion, AP reboot); surrender to the portal only
+      // after 3 full bars (~20s), never wiping the stored credentials
+      loadNum = 0;
+      if (++barCycles >= 3) {
+        // with WEB config on, smartconfig is retired
+        Web_win();
+        Webconfig();
+        break;
+      }
     }
   }
   delay(10);
