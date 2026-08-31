@@ -201,9 +201,9 @@ static const char MQTT_CA[] PROGMEM =
 // so savewificonfig can never clobber the device identity on boot
 #define DEV_ID_ADDR 150    // 150-165: deviceId string, NUL-terminated (max 15 chars)
 #define DEV_TOKEN_ADDR 166 // 166-199: token string, NUL-terminated (max 32 chars)
-char deviceId[16] = "";      // e.g. Rubato-A1B2C3, shown on the boot screen
+char deviceId[16] = "";      // e.g. RUBATO-A1B2C3, shown on the boot screen
 char devToken[33] = "";      // random token from the provisioning ledger
-char suggestedId[16] = "";   // MAC-derived Rubato-<last 6 hex>, filled in loadDeviceInfo()
+char suggestedId[16] = "";   // MAC-derived RUBATO-<last 6 hex>, filled in loadDeviceInfo()
 String mqttStateTopic = "";  // rubato/<deviceId>/state, built in loadDeviceInfo()
 
 WiFiClientSecure* mqttNet = nullptr;  // heap object: OTA deletes it to free the MQTT TLS RAM
@@ -236,14 +236,14 @@ void loadDeviceInfo() {
   // before provisioning - the boot screen shows it so 0x06 input is copy-free
   // MAC-derived identity: strip separators and normalize case first (the
   // format differs across cores: with/without colons, upper/lower), then take
-  // the LAST 6 hex digits, e.g. 3c8a1f43216c -> Rubato-43216c
+  // the LAST 6 hex digits, e.g. 3c8a1f43216c -> RUBATO-43216C
   String mac = WiFi.macAddress();
   String hex = "";
   for (unsigned int i = 0; i < mac.length(); i++) {
     char c = mac[i];
-    if (isxdigit(c)) hex += (char)tolower(c);
+    if (isxdigit(c)) hex += (char)toupper(c);
   }
-  String sug = String("Rubato-") + (hex.length() >= 6 ? hex.substring(hex.length() - 6) : hex);
+  String sug = String("RUBATO-") + (hex.length() >= 6 ? hex.substring(hex.length() - 6) : hex);
   sug.toCharArray(suggestedId, sizeof(suggestedId));
 }
 
@@ -252,7 +252,7 @@ bool provisionDevice(String id, String token) {
   id.trim();
   token.trim();
   if (id.length() < 3 || id.length() > 15) {
-    Serial.println("[PROV] bad deviceId: 3-15 chars, no spaces (e.g. Rubato-A1B2C3)");
+    Serial.println("[PROV] bad deviceId: 3-15 chars, no spaces (e.g. RUBATO-A1B2C3)");
     return false;
   }
   if (token.length() < 8 || token.length() > 32) {
@@ -410,13 +410,10 @@ void loading(byte delayTime)  // draw boot screen: progress bar, status, id plat
   clk.setTextColor(TFT_GREEN, COL_BG);
   clk.drawString("Connecting to WiFi......", 120, 40, 2);
 
-  // bottom plate row: device id with the brand prefix uppercased (RUBATO-xxxxxx),
+  // bottom plate row: device id as provisioned (or the MAC-derived suggestion),
   // version pinned bottom-right; x=108 keeps clearance from the version string
   clk.setTextColor(COL_INK_2, COL_BG);
-  String plate = deviceId[0] ? deviceId : suggestedId;
-  int dash = plate.indexOf('-');
-  plate = "RUBATO-" + (dash >= 0 ? plate.substring(dash + 1) : plate);
-  clk.drawString(plate, 108, 106, 2);
+  clk.drawString(deviceId[0] ? deviceId : suggestedId, 108, 106, 2);
   clk.drawRightString(Version, 236, 106, 2);
 
   clk.pushSprite(0, 110);  // window position
@@ -531,7 +528,7 @@ void Serial_set() {
         if (sp > 0) {
           provisionDevice(args.substring(0, sp), args.substring(sp + 1));
         } else {
-          Serial.println("Usage: 0x06 <deviceId> <token>   e.g. 0x06 Rubato-A1B2C3 3f9c8e21...");
+          Serial.println("Usage: 0x06 <deviceId> <token>   e.g. 0x06 RUBATO-A1B2C3 3f9c8e21...");
         }
         SMOD = "";
       } else if (SMOD == "0x07") {
@@ -589,7 +586,7 @@ bool mqttConnect() {
   }
   mqttNet->setTrustAnchors(mqttCA);  // chain + hostname verified; pre-NTP boot waits for a sane clock
 
-  String clientId = String(deviceId);  // already unique and prefixed (Rubato-xxxxxx)
+  String clientId = String(deviceId);  // already unique and prefixed (RUBATO-xxxxxx)
   bool ok = mqttClient.connect(clientId.c_str(), deviceId, devToken);
   if (ok) {
     mqttClient.subscribe(mqttStateTopic.c_str());
