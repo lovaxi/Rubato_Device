@@ -410,11 +410,9 @@ void loading(byte delayTime)  // draw boot screen: progress bar, status, id plat
   clk.setTextColor(TFT_GREEN, COL_BG);
   clk.drawString("Connecting to WiFi......", 120, 40, 2);
 
-  // bottom plate row: EMQX identity centered like an appliance serial, version pinned bottom-right
+  // bottom plate row: brand mark centered like an appliance badge, version pinned bottom-right
   clk.setTextColor(COL_INK_2, COL_BG);
-#if MQTT_EN
-  clk.drawString(deviceId[0] ? deviceId : suggestedId, 120, 106, 2);
-#endif
+  clk.drawString("RUBATO", 120, 106, 2);
   clk.drawRightString(Version, 236, 106, 2);
 
   clk.pushSprite(0, 110);  // window position
