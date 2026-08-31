@@ -6,6 +6,8 @@
 
 ![Rubato](assets/product.jpg)
 
+![Rubato 实拍演示](assets/product.mp4)
+
 Rubato 是一台基于 ESP8266 的桌面伴侣（240×240 彩屏）。它监测你的 AI 编程会话，把 AI 的等待时间转化为你的健康休息。
 
 ## 工作方式
