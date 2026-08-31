@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-Thinktime makes your AI's working state visible — on a physical desk device. The device plugins lives at [Thinktime_Plugins](https://github.com/lovaxi/Thinktime_Plugins).
+Thinktime makes your AI's working state visible — on a physical desk device. The device plugins lives at [Rubato_Plugins](https://github.com/lovaxi/Rubato_Plugins).
 ![Thinktime device](assets/product.jpg)
 
 
