@@ -693,12 +693,10 @@ void orbBegin(uint32_t nowMs) {
 }
 
 // ============ Health reminder (V1.2) ============
-// Long tasks over threshold earn a random micro-break in work hours, daily quota per activity;
-#define HEALTH_EST_SEC 45.0f                  // trigger threshold: estimate seconds
-#define HEALTH_MIN_GAP_MS (40UL * 60 * 1000)  // global min gap between reminders: 40 min;
-#define HEALTH_WORK_START_H 9                     // work window 9:00-18:30 (tunable)
-#define HEALTH_WORK_END_H 18
-#define HEALTH_WORK_END_MIN 30  // minute granularity at the end hour
+// AI activity means not resting: any Estimate >= threshold arms a micro-break - no clock-based
+// window. Two health full-screens stay >= 30 min apart (lastHealthMs), daily quota per activity.
+#define HEALTH_EST_SEC 30.0f                  // trigger threshold: estimate seconds (estSec >= 30)
+#define HEALTH_MIN_GAP_MS (30UL * 60 * 1000)  // min gap between health full-screens: 30 min
 #define HEALTH_ACTS 6           // activity count (water/toilet/eyes/neck/kegel/stand)
 #define HEALTH_ADDR 140         // EEPROM addr 140-141: day key, 142-147: six counters (deviceId at 150, 148-149 spare)
 // two-line reminder copy: natural sentence flow ("Drink One Glass / of Water"); the quantity/duration
@@ -782,13 +780,6 @@ void healthSave() {
   EEPROM.write(HEALTH_ADDR + 1, (uint8_t)(healthDayKey & 0xFF));
   for (uint8_t i = 0; i < HEALTH_ACTS; i++) EEPROM.write(HEALTH_ADDR + 2 + i, healthCount[i]);
   EEPROM.commit();
-}
-
-bool healthWindowOk()   // work window 9:00-18:30 (half-hour granularity at the end)
-{
-  if (hour() < HEALTH_WORK_START_H || hour() > HEALTH_WORK_END_H) return false;
-  if (hour() == HEALTH_WORK_END_H) return (minute() < HEALTH_WORK_END_MIN);
-  return true;
 }
 
 // pick a random activity with quota left; -1 when full
@@ -1267,14 +1258,11 @@ void applyMqttMsg(const String& raw) {
     bXfadeMs = millis();
   }
 
-  // health trigger eval: estimate over threshold + work window + gap + quota (log the block reason)
-  if (hasEst && !isDone && !healthPending && !healthShownTask && workEstSec > HEALTH_EST_SEC) {
+  // health trigger eval: estimate over threshold + gap + quota (log the block reason)
+  if (hasEst && !isDone && !healthPending && !healthShownTask && workEstSec >= HEALTH_EST_SEC) {
     healthRollDay();
-    if (!healthWindowOk())
-      Serial.printf("[BAND %8u] est %.0fs > %.0fs: work window closed (9:00-18:30), no reminder\n",
-                    (unsigned)millis(), workEstSec, (double)HEALTH_EST_SEC);
-    else if (millis() - lastHealthMs < HEALTH_MIN_GAP_MS)
-      Serial.printf("[BAND %8u] est %.0fs: gap < 40min since last reminder, no reminder\n",
+    if (millis() - lastHealthMs < HEALTH_MIN_GAP_MS)
+      Serial.printf("[BAND %8u] est %.0fs: gap < 30min since last reminder, no reminder\n",
                     (unsigned)millis(), workEstSec);
     else {
       int8_t pick = healthPick();
@@ -1859,6 +1847,8 @@ void setup() {
   otaGuardBoot();  // anti-brick: count armed boots, trip safe mode on a crash loop
   EEPROM.begin(1024);
   healthLoad();  // load today reminder counters (auto-reset on day change)
+  lastHealthMs = millis() - HEALTH_MIN_GAP_MS;  // fresh boot: no phantom cooldown, the first
+                                                // qualifying estimate may fire right away
   // wm.resetSettings();    // uncomment to wipe saved WiFi on boot
 
   // backlight from EEPROM
