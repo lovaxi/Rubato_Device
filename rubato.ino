@@ -121,38 +121,6 @@ uint8_t UpdateWeater_en = 0;  // weather update request flag
 uint8_t tempUnits = 0;        // 0 = Celsius (default), 1 = Fahrenheit (display conversion only)
 int prevTime = 0;             // rolling display flag
 
-// ---- formal log stamping: every Serial line gets a syslog-style [YYYY-MM-DD HH:MM:SS] prefix.
-// HardwareSerial wrapped once (#define Serial below): zero call-site changes, the stamp lands on
-// every line boundary. Before NTP sync the clock reads 1970 - honest, and self-corrects on first sync.
-class TimeStampedSerial : public Print {
-  public:
-    explicit TimeStampedSerial(HardwareSerial& s) : _s(s) {}
-    void begin(unsigned long baud) { _s.begin(baud); _bol = true; }
-    int available() { return _s.available(); }
-    int read() { return _s.read(); }
-    void flush() { _s.flush(); }
-    size_t write(uint8_t c) override {
-      if (_bol) { stamp(); _bol = false; }
-      if (c == '\n') _bol = true;
-      return _s.write(c);
-    }
-    size_t write(const uint8_t* buf, size_t n) override {
-      for (size_t i = 0; i < n; i++) write(buf[i]);  // byte-wise: tracks line boundaries inside printf
-      return n;
-    }
-  private:
-    HardwareSerial& _s;
-    bool _bol = true;  // beginning of line: the next char needs the stamp
-    void stamp() {
-      char pre[26];
-      snprintf(pre, sizeof(pre), "[%04d-%02d-%02d %02d:%02d:%02d] ",
-               year(), month(), day(), hour(), minute(), second());
-      _s.print(pre);
-    }
-};
-TimeStampedSerial LogSer(Serial);
-#define Serial LogSer
-
 
 // EEPROM addr 140-146: day key + five counters; 147-149 spare; 150-194 device identity
 int BL_addr = 1;     // addr 1: backlight
