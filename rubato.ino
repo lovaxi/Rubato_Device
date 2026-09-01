@@ -2193,16 +2193,17 @@ void drawWeatherUI(int wcode, int tempI, int humi) {
   // temp icon + value + humidity icon + value: one row, bottom-aligned (FreeSans9pt7b)
   // temp: digits + a hand-drawn degree circle + C/F (no unit glyph in any loaded font - composed)
   // ink3: quiet, never competes
-  clk.createSprite(72, 24);
-  clk.fillSprite(bgColor);
-  clk.setTextDatum(TL_DATUM);
-  clk.setTextColor(COL_INK_3, bgColor);
   clk.setFreeFont(&FreeSans9pt7b);
   int shownTemp = tempI;
   if (tempUnits) shownTemp = (int)lroundf(tempI * 9.0f / 5.0f + 32.0f);  // C -> F conversion for display
   String tstr = String(shownTemp);
+  int tw = clk.textWidth(tstr);                      // measure BEFORE creating: sprite is content-sized
+  clk.createSprite(tw + 18, 24);                     // digits + degree dot + unit letter; the old fixed 72px
+                                                     // sprite overlapped the humidity icon's left edge
+  clk.fillSprite(bgColor);
+  clk.setTextDatum(TL_DATUM);
+  clk.setTextColor(COL_INK_3, bgColor);
   clk.drawString(tstr, 0, 6);                        // digits (light, pale gray)
-  int tw = clk.textWidth(tstr);
   clk.fillCircle(tw + 3, 9, 2, COL_INK_3);           // hand-drawn degree dot, hugs the digits
   clk.drawString(tempUnits ? "F" : "C", tw + 8, 6);  // unit letter
   clk.pushSprite(66, 213);                           // bottom-aligned with the icons (icon bottom edge 237)
@@ -2216,6 +2217,10 @@ void drawWeatherUI(int wcode, int tempI, int humi) {
   clk.drawString(String(humi) + "%", 0, 6);
   clk.pushSprite(156, 213);
   clk.deleteSprite();
+  // bottom-row icons LAST: every value sprite above is pushed after fillSprite(bgColor), so
+  // painting the decals last makes the row self-healing regardless of value widths
+  TJpgDec.drawJpg(40, 213, temperature, sizeof(temperature));
+  TJpgDec.drawJpg(130, 213, humidity, sizeof(humidity));
   // city name (left edge, FreeSansBold12pt7b; clear of the weather icon)
   clk.createSprite(150, 32);
   clk.fillSprite(bgColor);
