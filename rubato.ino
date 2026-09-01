@@ -381,18 +381,8 @@ void readwificonfig() {
   Serial.printf("[WIFI] config loaded: ssid='%s'\r\n", wificonf.stassid);  // psw intentionally not logged
 }
 
-// health icon sprite capture: TJpgDec decodes the icon once into RAM, bob frames then blit it
-// in a few ms - re-decoding per frame showed as flicker on real hardware
-TFT_eSprite healthIconSpr = TFT_eSprite(&tft);
-bool healthIconCapture = false;  // true: tft_output routes decode blocks into healthIconSpr
-bool healthIconSprOk = false;    // sprite allocated (false = low heap: static poster, no bob)
-
 // TFT JPEG output callback
 bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
-  if (healthIconCapture) {  // decode straight into the health icon sprite (drawJpg anchored at 70,32)
-    healthIconSpr.pushImage(x - 70, y - 32, w, h, bitmap);
-    return 1;
-  }
   if (y >= tft.height()) return 0;
   tft.pushImage(x, y, w, h, bitmap);
   // Return 1 to decode next block
@@ -1322,7 +1312,6 @@ void renderIntro(uint32_t nowMs) {
 // Health page: FULL-SCREEN takeover (not a band). Fade = backlight PWM; no 240x240 canvas (fragmentation lesson):
 void healthScreenTick(uint32_t nowMs) {
   orbCanvas(false);  // the health page never renders the orb: free it on entry (idempotent), freeing 8.6KB of heap
-  static int healthBobDy = 0;  // last applied icon bob offset (999-ish sentinel not needed: reset on page entry)
   uint32_t t = nowMs - healthStageStart;
 
   if (healthStage == 0) {  // stage 0: full-screen fade-out, backlight ramps down
@@ -1360,41 +1349,18 @@ void healthScreenTick(uint32_t nowMs) {
     blWrite(healthBlCur);
     if (t >= 400) {
       healthStage = 2;
-      healthStageStart = nowMs;  // hold: the icon bobs ±2px on a 4s sine, the copy stays still
-      healthBobDy = 0;           // stage 0 drew the icon at dy=0, so that frame is already correct
-      // cache the icon into a 16bpp sprite (20KB, freed at fade-out); if the heap says no,
-      // the poster stays static - flicker is worse than stillness
-      healthIconSpr.setColorDepth(16);
-      healthIconCapture = true;
-      healthIconSprOk = (healthIconSpr.createSprite(100, 100) != nullptr);
-      TJpgDec.drawJpg(70, 32, HEALTH_ICONS[healthActivity], HEALTH_ICON_LEN[healthActivity]);
-      healthIconCapture = false;
+      healthStageStart = nowMs;  // static poster: no per-frame animation, stillness is the elegance
     }
     return;
   }
 
-  if (healthStage == 2) {  // hold: only the icon moves - ±2px vertical sine, 4s period (same tempo
-    // as the idle breath orb); the cached sprite blits per step, the copy stays still
-    if (healthIconSprOk) {
-      int dy = (int)(2.0f * sinf((nowMs - healthStageStart) * (2.0f * PI / 4000.0f)));
-      if (dy != healthBobDy) {
-        int prevY = 32 + healthBobDy, newY = 32 + dy;
-        if (newY > prevY) tft.fillRect(70, prevY, 100, newY - prevY, bgColor);           // sliver on top
-        else if (newY < prevY) tft.fillRect(70, newY + 100, 100, prevY - newY, bgColor); // sliver on bottom
-        healthIconSpr.pushSprite(70, newY);
-        healthBobDy = dy;
-      }
-    }
-    return;
-  }
+  if (healthStage == 2) return;  // stage 2: static hold, nothing on screen needs redraw
 
   if (healthStage == 3) {  // stage 3: done, full-screen fade-out
     float p = (t >= 500) ? 1.0f : (float)t / 500.0f;
     healthBlCur = healthBlFrom + (int)((1023 - healthBlFrom) * p);
     blWrite(healthBlCur);
     if (t >= 500) {
-      healthIconSpr.deleteSprite();  // free the bob cache (safe no-op if never created; done can land at any stage)
-      healthIconSprOk = false;
       // dark-field restore: lift takeover first (clock guard reads bandPhase), repaint clock+weather; date follows via IDLE
       bandPhase = BAND_IDLE;
       tft.fillScreen(bgColor);
