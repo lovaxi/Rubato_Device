@@ -29,6 +29,19 @@ Rubato 是一枚可以捧在手心的复古麦金塔小屏幕——基于 ESP826
 - **OTA 自升级**：分段 HTTPS 下载 + 防刷死守护——坏更新进 Safe Mode 远程自愈，无需 USB
 - **Web 设置**：亮度 / 方向 / 温度单位浏览器直改；所有设置断电不丢
 
+## 插件
+
+每个编码智能体各一个插件，共用同一套 MQTT 契约——从 [Rubato_Plugins](https://github.com/lovaxi/Rubato_Plugins) 安装。
+
+| 智能体 | 状态 |
+|---|---|
+| DeepSeek Harness | 可用 |
+| OpenClaw | 可用 |
+| Cursor | 可用 |
+| OpenCode | 可用 |
+| Codex | 计划中 |
+| Claude Code | 计划中 |
+
 ## 硬件与源码
 
 ESP8266（NodeMCU）+ 240×240 TFT，Arduino 框架（ESP8266 core 3.1.2 / TFT_eSPI）。固件在 `rubato.ino`，图标管线在 `tools/`。烧录、内置热点配网、一条串口指令完成设备发证——即插即用。

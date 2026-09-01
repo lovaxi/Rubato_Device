@@ -29,6 +29,19 @@ Each activity has a daily quota, and two full-screen breaks stay at least 30 min
 - **OTA self-update** — segmented HTTPS download with an anti-brick guard: a bad update lands in Safe Mode and self-heals remotely, no USB needed
 - **Web settings** — brightness, orientation, °C/°F from your browser; everything survives power loss
 
+## Plugins
+
+A plugin for every coding agent, all speaking the same MQTT contract — install from [Rubato_Plugins](https://github.com/lovaxi/Rubato_Plugins).
+
+| Agent | Status |
+|---|---|
+| DeepSeek Harness | available |
+| OpenClaw | available |
+| Cursor | available |
+| OpenCode | available |
+| Codex | planned |
+| Claude Code | planned |
+
 ## Hardware & source
 
 ESP8266 (NodeMCU) + 240×240 TFT, Arduino framework (ESP8266 core 3.1.2, TFT_eSPI). Firmware in `rubato.ino`, health-icon pipeline in `tools/`. Flash, provision WiFi through the built-in hotspot, pair with the broker via one serial command — done.
