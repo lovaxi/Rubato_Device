@@ -1312,6 +1312,7 @@ void renderIntro(uint32_t nowMs) {
 // Health page: FULL-SCREEN takeover (not a band). Fade = backlight PWM; no 240x240 canvas (fragmentation lesson):
 void healthScreenTick(uint32_t nowMs) {
   orbCanvas(false);  // the health page never renders the orb: free it on entry (idempotent), freeing 8.6KB of heap
+  static int healthBobDy = 0;  // last applied icon bob offset (999-ish sentinel not needed: reset on page entry)
   uint32_t t = nowMs - healthStageStart;
 
   if (healthStage == 0) {  // stage 0: full-screen fade-out, backlight ramps down
@@ -1349,12 +1350,22 @@ void healthScreenTick(uint32_t nowMs) {
     blWrite(healthBlCur);
     if (t >= 400) {
       healthStage = 2;
-      healthStageStart = nowMs;  // static poster: no per-frame animation, stillness is the elegance
+      healthStageStart = nowMs;  // hold: the icon bobs ±2px on a 4s sine, the copy stays still
+      healthBobDy = 0;           // stage 0 drew the icon at dy=0, so that frame is already correct
     }
     return;
   }
 
-  if (healthStage == 2) return;  // stage 2: static hold, nothing on screen needs redraw
+  if (healthStage == 2) {  // hold: only the icon moves - ±2px vertical sine, 4s period (same tempo
+    // as the idle breath orb); the icon band is repainted only when the offset steps, copy stays still
+    int dy = (int)(2.0f * sinf((nowMs - healthStageStart) * (2.0f * PI / 4000.0f)));
+    if (dy != healthBobDy) {
+      tft.fillRect(70, 30, 100, 106, bgColor);  // wipe the icon band (32-132 plus the 2px bob margin)
+      TJpgDec.drawJpg(70, 32 + dy, HEALTH_ICONS[healthActivity], HEALTH_ICON_LEN[healthActivity]);
+      healthBobDy = dy;
+    }
+    return;
+  }
 
   if (healthStage == 3) {  // stage 3: done, full-screen fade-out
     float p = (t >= 500) ? 1.0f : (float)t / 500.0f;
