@@ -8,19 +8,19 @@
 
 ![Rubato in action](assets/product.gif)
 
-Rubato is a retro-Macintosh mini screen that fits in your palm — an ESP8266 desk companion with a 240×240 color display. It watches your AI coding sessions and turns AI wait time into health breaks.
+Rubato is a retro-Macintosh mini screen that fits in your palm — an ESP8266 desk companion with a 240×240 color display. It sits quietly on your desk, watches your AI coding sessions and turns wait time into gentle health breaks — never in your way.
 
 ## How it works
 
 1. A small PC plugin publishes your AI session state over MQTT (TLS): `thinking` → `generating` → `done`
 2. A breathing orb mirrors the state — cream while thinking, glacier blue while generating, green when done
-3. When a task looks long (est. ≥ 30 s), Rubato takes over the full screen with a colorful micro-break reminder
+3. When a task looks long (est. ≥ 30 s), Rubato eases into a full-screen micro-break reminder
 
 ## Six daily breaks
 
 Water · Bathroom break · Eye rest · Neck stretch · Kegels · Standing desk
 
-Each activity has a daily quota, and two full-screen breaks stay at least 30 minutes apart, so reminders land at a humane rhythm — never spammy. The promise is reminders delivered, not completion-rate check-ins.
+Each activity has a daily quota, and two full-screen breaks stay at least 30 minutes apart. The design is quiet and natural — soft colors, slow rhythm, one gentle nudge at a time — so every break feels light and pleasant, never like an interruption. The promise is reminders delivered, not completion-rate check-ins.
 
 ## More than reminders
 
