@@ -44,7 +44,7 @@ Rubato 是一枚可以捧在手心的复古麦金塔小屏幕——基于 ESP826
 
 ## 硬件与源码
 
-ESP8266（NodeMCU）+ 240×240 TFT，Arduino 框架（ESP8266 core 3.1.2 / TFT_eSPI）。固件在 `rubato.ino`，图标管线在 `tools/`。烧录、内置热点配网、一条串口指令完成设备发证——即插即用。
+ESP8266（NodeMCU）+ 240×240 TFT，USB Type-C 供电。Arduino 框架（ESP8266 core 3.1.2 / TFT_eSPI）。固件在 `rubato.ino`，图标管线在 `tools/`。烧录、内置热点配网、一条串口指令完成设备发证——即插即用。
 
 ## 许可
 

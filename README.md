@@ -44,7 +44,7 @@ A plugin for every coding agent, all speaking the same MQTT contract — install
 
 ## Hardware & source
 
-ESP8266 (NodeMCU) + 240×240 TFT, Arduino framework (ESP8266 core 3.1.2, TFT_eSPI). Firmware in `rubato.ino`, health-icon pipeline in `tools/`. Flash, provision WiFi through the built-in hotspot, pair with the broker via one serial command — done.
+ESP8266 (NodeMCU) + 240×240 TFT, powered over USB Type-C. Arduino framework (ESP8266 core 3.1.2, TFT_eSPI). Firmware in `rubato.ino`, health-icon pipeline in `tools/`. Flash, provision WiFi through the built-in hotspot, pair with the broker via one serial command — done.
 
 ## License
 
