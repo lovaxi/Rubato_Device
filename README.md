@@ -8,7 +8,7 @@
 
 ![Rubato in action](assets/product.gif)
 
-Rubato is a retro-Macintosh mini screen that fits in your palm — an ESP8266 desk companion with a 240×240 color display. It sits quietly on your desk, watches your AI coding sessions and turns wait time into gentle health breaks — never in your way.
+Rubato is a palm-sized retro-Macintosh screen (ESP8266, 240×240 color display) built for one job: looking after the bodies of programmers and heavy AI users. Long sessions keep you pinned to the chair — dry eyes, a stiff neck, an aching back. Rubato watches your AI coding sessions and turns long waits into real, gentle breaks — water, eye rest, a stretch — on time, every day. The rest of the time it just sits quietly on your desk, never in your way.
 
 ## How it works
 
@@ -20,7 +20,7 @@ Rubato is a retro-Macintosh mini screen that fits in your palm — an ESP8266 de
 
 Water · Bathroom break · Eye rest · Neck stretch · Kegels · Standing desk
 
-Each activity has a daily quota, and two full-screen breaks stay at least 30 minutes apart. The design is quiet and natural — soft colors, slow rhythm, one gentle nudge at a time — so every break feels light and pleasant, never like an interruption. The promise is reminders delivered, not completion-rate check-ins.
+The six targets are what sitting all day actually costs: dehydration, eye strain, a stiff neck, stagnant circulation. Each activity has a daily quota, and two full-screen breaks stay at least 30 minutes apart. The design is quiet and natural — soft colors, slow rhythm, one gentle nudge at a time — so every break feels light and pleasant, never like an interruption. The promise is reminders delivered, not completion-rate check-ins.
 
 ## More than reminders
 
