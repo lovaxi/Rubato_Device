@@ -619,6 +619,7 @@ enum BandPhase : uint8_t { BAND_IDLE = 0,
                            BAND_HEALTH = 4 };
 
 BandPhase bandPhase = BAND_IDLE;
+uint32_t workingSinceMs = 0;  // when the current breath started (gates the health takeover grace)
 bool bandGen = false;      // target phase: false = Thinking / true = Generating
 String introModel = "";    // intro caption model name (future: per-LLM logos)
 float workEstSec = -1.0f;  // latest estimate seconds; over threshold arms the reminder (cleared on new task / done)
@@ -697,6 +698,9 @@ void orbBegin(uint32_t nowMs) {
 // window. Two health full-screens stay >= 30 min apart (lastHealthMs), daily quota per activity.
 #define HEALTH_EST_SEC 30.0f                  // trigger threshold: estimate seconds (estSec >= 30)
 #define HEALTH_MIN_GAP_MS (30UL * 60 * 1000)  // min gap between health full-screens: 30 min
+#define HEALTH_TAKEOVER_DELAY_MS (20UL * 1000) // grace after the breath starts: the opening sequence
+                                              // (model caption + a breathing beat) stays visible;
+                                              // estimates arriving later than this fire immediately
 #define HEALTH_ACTS 6           // activity count (water/toilet/eyes/neck/kegel/stand)
 #define HEALTH_ADDR 140         // EEPROM addr 140-141: day key, 142-147: six counters (deviceId at 150, 148-149 spare)
 // two-line reminder copy: natural sentence flow ("Drink One Glass / of Water"); the quantity/duration
@@ -1238,6 +1242,7 @@ void applyMqttMsg(const String& raw) {
     if (model.length() == 0) {
       // no model name: skip caption, start breathing right away
       bandPhase = BAND_WORKING;
+      workingSinceMs = millis();
       bPrev = bCur = (bandGen ? BS_GEN : BS_THINK);
       orbBegin(millis());
     } else {
@@ -1479,13 +1484,15 @@ void drawDateArea() {
       // caption finished: start breathing in the phase picked during the caption
       Serial.printf("[BAND %8u] INTRO -> WORKING  heap=%u blk=%u\n", (unsigned)nowMs, (unsigned)ESP.getFreeHeap(), (unsigned)ESP.getMaxFreeBlockSize());
       bandPhase = BAND_WORKING;
+      workingSinceMs = nowMs;
       bPrev = bCur = (bandGen ? BS_GEN : BS_THINK);
       orbBegin(nowMs);
     }
     lastDateAreaDraw = 0;
   }
-  if (bandPhase == BAND_WORKING && healthPending) {
-    // long estimate mid-task: full-screen takeover
+  if (bandPhase == BAND_WORKING && healthPending && nowMs - workingSinceMs >= HEALTH_TAKEOVER_DELAY_MS) {
+    // long estimate: full-screen takeover, but only after the grace period - estimates that arrive
+    // mid-task (past the grace) fire right away, upfront estimates let the opening play out first
     Serial.printf("[BAND %8u] WORKING -> HEALTH: %s\n", (unsigned)nowMs, healthPhrase(healthActivity).c_str());
     bandPhase = BAND_HEALTH;
     healthStage = 0;  // start with the full-screen fade-out (backlight down)
