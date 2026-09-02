@@ -619,7 +619,6 @@ enum BandPhase : uint8_t { BAND_IDLE = 0,
                            BAND_HEALTH = 4 };
 
 BandPhase bandPhase = BAND_IDLE;
-bool bandResumeWork = false;  // a live task arrived behind the health page: resume its breath on exit
 bool bandGen = false;      // target phase: false = Thinking / true = Generating
 String introModel = "";    // intro caption model name (future: per-LLM logos)
 float workEstSec = -1.0f;  // latest estimate seconds; over threshold arms the reminder (cleared on new task / done)
@@ -1214,7 +1213,6 @@ void applyMqttMsg(const String& raw) {
     // done: green finish only while the orb is on stage; during intro just cancel back to date
     healthPending = false;  // drop an unshown reminder with the task
     workEstSec = -1.0f;     // clear the stale estimate
-    bandResumeWork = false; // done ends whatever streamed behind the health page: exit lands on the date
     if (bandPhase == BAND_WORKING) {
       bandPhase = BAND_FADEOUT;
       fadeStartMs = millis();
@@ -1236,10 +1234,6 @@ void applyMqttMsg(const String& raw) {
 
   if (isEstimate) {
     // estimate is metadata only: no caption/orb (no done will follow, avoid an orphan breath),
-  } else if (bandPhase == BAND_HEALTH) {
-    // task message behind the full-screen health page: style already recorded above (bandGen);
-    // flag it so the health exit resumes breathing instead of dropping to the date
-    bandResumeWork = true;
   } else if (bandPhase == BAND_IDLE) {
     if (model.length() == 0) {
       // no model name: skip caption, start breathing right away
@@ -1367,7 +1361,7 @@ void healthScreenTick(uint32_t nowMs) {
     healthBlCur = healthBlFrom + (int)((1023 - healthBlFrom) * p);
     blWrite(healthBlCur);
     if (t >= 500) {
-      // dark-field restore: lift takeover first (clock guard reads bandPhase), repaint clock+weather
+      // dark-field restore: lift takeover first (clock guard reads bandPhase), repaint clock+weather; date follows via IDLE
       bandPhase = BAND_IDLE;
       tft.fillScreen(bgColor);
       orbCanvas(false);  // free the orb canvas if a mid-task takeover held it (8.6KB back)
@@ -1375,21 +1369,11 @@ void healthScreenTick(uint32_t nowMs) {
       if (weatherValid) drawWeatherUI(lastWcode, lastTemp, lastHumi);
       TJpgDec.drawJpg(40, 213, temperature, sizeof(temperature));  // bottom icons are boot-time decals,
       TJpgDec.drawJpg(130, 213, humidity, sizeof(humidity));       // repaint here after fillScreen wiped them
-      if (bandResumeWork) {
-        // a task kept streaming behind the health page: resume its breath instead of the date
-        bandResumeWork = false;
-        bandPhase = BAND_WORKING;
-        bPrev = bCur = (bandGen ? BS_GEN : BS_THINK);
-        orbBegin(nowMs);
-        dateInStartMs = 0;
-        Serial.printf("[BAND %8u] HEALTH -> WORKING (resume %s)\n", (unsigned)nowMs, bandGen ? "generating" : "thinking");
-      } else {
-        dateInStartMs = nowMs;  // date fade-in (600ms, parallel with the backlight ramp)
-        Serial.printf("[BAND %8u] HEALTH -> IDLE (restoring)\n", (unsigned)nowMs);
-      }
+      dateInStartMs = nowMs;                                       // date fade-in (600ms, parallel with the backlight ramp)
       lastDateAreaDraw = 0;
       healthStage = 4;
       healthStageStart = nowMs;
+      Serial.printf("[BAND %8u] HEALTH -> IDLE (restoring)\n", (unsigned)nowMs);
     }
     return;
   }
