@@ -10,6 +10,10 @@
 
 Rubato 是一枚捧在手心的复古麦金塔小屏幕（ESP8266，240×240 彩屏），只为一件事而生：**看护程序员与 AI 重度使用者的身体**。长会话把人钉在椅子上——眼睛干涩、肩颈僵硬、腰椎酸痛。它监测你的 AI 编程会话，把漫长的等待变成一次真实的休息：喝口水、看看远处、伸个懒腰——按时，每天，不打扰。其余时间，它只是安静地守在桌上。
 
+## 购买
+
+正式销售：**[Tindie — Rubato 复古麦金塔 AI 桌面伴侣](https://www.tindie.com/products/beartificialintelligence/rubato-retro-mac-ai-desk-companion/)**
+
 ## 工作方式
 
 1. PC 端小插件通过 MQTT（TLS）发布 AI 会话状态：`thinking` → `generating` → `done`

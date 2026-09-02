@@ -10,6 +10,10 @@
 
 Rubato is a palm-sized retro-Macintosh screen (ESP8266, 240×240 color display) built for one job: looking after the bodies of programmers and heavy AI users. Long sessions keep you pinned to the chair — dry eyes, a stiff neck, an aching back. Rubato watches your AI coding sessions and turns long waits into real, gentle breaks — water, eye rest, a stretch — on time, every day. The rest of the time it just sits quietly on your desk, never in your way.
 
+## Get one
+
+Official store: **[Tindie — Rubato, Retro Mac AI Desk Companion](https://www.tindie.com/products/beartificialintelligence/rubato-retro-mac-ai-desk-companion/)**
+
 ## How it works
 
 1. A small PC plugin publishes your AI session state over MQTT (TLS): `thinking` → `generating` → `done`
