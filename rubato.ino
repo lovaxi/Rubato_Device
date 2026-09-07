@@ -1204,9 +1204,13 @@ void applyMqttMsg(const String& raw) {
   bool hasEst = doc.containsKey("estSec");
   if (hasEst) workEstSec = doc["estSec"].as<float>();
 
-  // one concise line per incoming message (state + model [+ estimate])
-  if (hasEst) Serial.printf("[BAND] rx %s %s est=%.1fs\n", st.c_str(), model.c_str(), (double)workEstSec);
-  else Serial.printf("[BAND] rx %s %s\n", st.c_str(), model.c_str());
+  // one concise line per incoming message (state + model [+ estimate] + heap watermark)
+  // heap = free bytes, blk = largest contiguous free block: a shrinking blk under a stable heap
+  // means fragmentation; a steadily sinking heap means a real leak - either way the trend names it
+  if (hasEst) Serial.printf("[BAND] rx %s %s est=%.1fs heap=%u blk=%u\n", st.c_str(), model.c_str(),
+                            (double)workEstSec, (unsigned)ESP.getFreeHeap(), (unsigned)ESP.getMaxFreeBlockSize());
+  else Serial.printf("[BAND] rx %s %s heap=%u blk=%u\n", st.c_str(), model.c_str(),
+                     (unsigned)ESP.getFreeHeap(), (unsigned)ESP.getMaxFreeBlockSize());
 
   if (stLow == "ota") {  // firmware update command: {"state":"ota","ver","url","md5"}
     startOtaUpdate(doc["ver"].as<String>(), doc["url"].as<String>(), doc["md5"].as<String>());
