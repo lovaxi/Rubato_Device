@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-09-02 · V1.0.7 静音打磨 + 定时降频 + 堆探针（固件 V1.1.1 → V1.1.2）
+
+- **健康提醒策略落地（补记，前次未入档）**：estSec ≥ 30 门槛即开关（原 45s/>），无工作时段窗口——"有 AI 活动就是没在休息，门槛即开关"；两次全屏提醒全局间隔 ≥ 30 分钟（lastHealthMs）；插件侧零改动
+- **健康屏接管宽限期（本版核心修复）**：插件契约"Estimate 先于一切"→ estSec ≥ 30 的任务开场即武装，字幕播完（1.8s）直接被全屏吞掉，开场序列（模型名 + 呼吸）消失。新增 `HEALTH_TAKEOVER_DELAY_MS` 20s：呼吸满 20s 才允许接管；估算晚到（已过宽限）的任务即时接管（真 mid-task）；短任务（est < 30）从不打扰
+- **底行图标灰线化**：lucide thermometer/droplet 线性图标，#929292 与数值同灰（COL_INK_3），24×24 黑底 JPEG（460/514B）——底行降为次级信息，视觉中心还给时钟；**顺带修老 bug**：温度数值精灵固定 72px 从 x=66 推屏，黑底盖掉 x=130 起湿度图标左 8 列（"时好时坏"真凶）——改按内容自适应宽度 + drawWeatherUI 末尾补画图标（落笔顺序自愈）；工具三件套入库（`_gen_home_icons` 生成 / `_preview_home_icons` 烧前预览 / `_diag_home_icons` 像素诊断）
+- **健康屏浮动动画实验与移除**：±2px 正弦浮动两版（直绘版忽闪 → 16bpp 精灵缓存版消除闪烁）后用户终审"看不出，没用"——整体拆除回归静态海报，rubato.ino 相对实验前净差异为零。设计结论：**动不如静，不可感知的运动没有存在价值**
+- **日志包装器事故（已回滚）**：TimeStampedSerial 全局包装（#define Serial）让全部日志自动带 `[YYYY-MM-DD HH:MM:SS]` 前缀，真机 boot loop（`~ld` 后零输出）→ 整体回滚。教训：全局构造层面的一次性改动必须真机先行；真机排障中确认 ROM 装载行 74880 / sketch 115200 双波特率现象——"乱码"一度意味着设备其实活着
+- **定时降频**：NTP `setSyncInterval` 300s → 21600（6h——晶振日漂 2-4s（20-40ppm），分钟级显示无需 5 分钟一校）；天气 `WEATHER_REFRESH_MIN` 10 → 180（3h——温湿变化小时级，HTTPS+JSON+重绘的堆搅动降为 1/6）；开机 / 设置保存 / 旋转切换仍强制即时刷新
+- **堆探针**：`[BAND] rx` 日志每条带 `heap=`（空闲字节）/ `blk=`（最大连续块）——下次长任务重启可直接判定：heap 单调下降 = 真泄露；heap 稳 blk 塌陷 = 碎片化；两者皆稳 = 另寻他因（WDT/驱动/电源）。消息路径本身已栈上解析（StaticJsonDocument<512>），单条消息堆搅动极小
+- **健康屏退场接续（提出 → 回滚）**：曾实现屏后任务消息缓存 + 退场续呼吸，用户推演"出口即 done，退场时最后一条消息永远不是 Generating"——整体回滚，退出回日期为正确闭环
+- **销售与发现性基建**：Tindie 正式销售链接进 README（中英"购买 / Get one"小节）+ 仓库 About homepage 字段直指店铺；社交预览卡 1280×640（黑底 + 实拍 + 纯白文字，三轮迭代定稿）入库 `assets/social-preview.png` + 生成脚本 `_gen_social_preview.cjs`（上传仍须手动：Settings → Social preview）；topics 双仓挂满（dsh-plugin / ai-agent / claude-code / opencode / cursor / openclaw / status-display / tft / esp8266 / mqtt / health-reminder / microbreak / arduino / desk-clock）
+- **README 定位校准（用户指令）**：健康从卖点升为存在理由——"built for one job: looking after the bodies of programmers and heavy AI users"，直写久坐代价（眼干 / 肩颈 / 腰椎 / 循环），去"桌面伴侣"玩物感措辞；形制描写保留为载体
+- **新约定**：GitHub 提交信息一律英文（自本条起生效）
+
+---
+
 ## 2026-08-31 · V1.0.6 二次更名 rubato（fadai → rubato）
 
 - **更名动机**：用户终审拍板 **Rubato**——意大利乐术语 *tempo rubato*（"被偷走的时间"）：AI 占用时间，产品把时间偷回来还给用户，与产品承诺（AI Workload → Free Time）叙事严丝合缝；面向欧美人群好读好记

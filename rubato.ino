@@ -3,7 +3,7 @@
  * Rubato (tempo rubato: "stolen time" - time given back to you)
  * 
  * *****************************************************************/
-#define Version "V1.1.1"  // OTA compares this against the ver field; keep bumping every release
+#define Version "V1.1.2"  // OTA compares this against the ver field; keep bumping every release
 /* *****************************************************************
  *  Libraries and headers
  * *****************************************************************/
