@@ -1953,7 +1953,8 @@ void setup() {
   Udp.begin(localPort);
   Serial.println("Waiting for time sync...");
   setSyncProvider(getNtpTime);
-  setSyncInterval(300);
+  setSyncInterval(21600);  // 6h: crystal drift is ~20-40ppm (~2-4s/day worst case), so 6h keeps the
+                           // clock sub-second accurate without a UDP round-trip every 5 minutes
 
 
 
