@@ -76,7 +76,9 @@ struct config_type {
 config_type wificonf = { { "" }, { "" } };
 
 
-#define WEATHER_REFRESH_MIN 10  // weather refresh interval (minutes)
+#define WEATHER_REFRESH_MIN 180  // weather refresh interval (minutes): temp/humidity move on hourly
+                                 // scales, 3h keeps the display honest while cutting the per-refresh
+                                 // HTTPS + JSON + redraw heap churn to a sixth; boot/settings/rotation still force one
 int LCD_Rotation = 0;           // LCD rotation
 int LCD_BL_PWM = 30;            // backlight 0-100, default 30
 String cityCode = "Shanghai";   // weather city (English, shown on screen)
